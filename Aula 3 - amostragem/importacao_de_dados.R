@@ -78,9 +78,6 @@ media_estados_unidos1
 media_china1 <- mean(top10_paises_com_mais_empresas[top10_paises_com_mais_empresas$Pais == 'China', 'Valor_em_B'])
 media_china1
 
-
-dim(top10_paises_com_mais_empresas)
-
 #definindo o n
 n <- 100
 
@@ -110,35 +107,16 @@ n8 <- round(n * nrow(subset(top10_paises_com_mais_empresas, Pais == 'Canada')) /
 n9 <- round(n * nrow(subset(top10_paises_com_mais_empresas, Pais == 'Brazil')) / nrow(top10_paises_com_mais_empresas))
 n10 <- round(n * nrow(subset(top10_paises_com_mais_empresas, Pais == 'South Korea')) / nrow(top10_paises_com_mais_empresas))
 
-estratos <- split(top10_paises_com_mais_empresas, top10_paises_com_mais_empresas$Pais)
 
-# retirando a amostra estratificada para cada país
+# install.packages('sampling')
+library(sampling)
 
-amostra_estratificada1 <- estratos[['United States']][sample(1:nrow(estratos[['United States']]), n1),]
-amostra_estratificada2 <- estratos[['China']][sample(1:nrow(estratos[['China']]), n2),]
-amostra_estratificada3 <- estratos[['India']][sample(1:nrow(estratos[['India']]), n3),]
-amostra_estratificada4 <- estratos[['United Kingdom']][sample(1:nrow(estratos[['United Kingdom']]), n4),]
-amostra_estratificada5 <- estratos[['Germany']][sample(1:nrow(estratos[['Germany']]), n5),]
-amostra_estratificada6 <- estratos[['France']][sample(1:nrow(estratos[['France']]), n6),]
-amostra_estratificada7 <- estratos[['Israel']][sample(1:nrow(estratos[['Israel']]), n7),]
-amostra_estratificada8 <- estratos[['Canada']][sample(1:nrow(estratos[['Canada']]), n8),]
-amostra_estratificada9 <- estratos[['Brazil']][sample(1:nrow(estratos[['Brazil']]), n9),]
-amostra_estratificada10 <- estratos[['South Korea']][sample(1:nrow(estratos[['South Korea']]), n10),]
+amostra_estratificada <- strata(top10_paises_com_mais_empresas, c('Pais'), c(n2,n1,n4, n3, n5, n8, n6, n7, n9, n10), method="srswor")
+top10_paises_com_mais_empresas[unlist(amostra_estratificada['ID_unit']),]
+amostra_estratificada
 
-
-media_estados_unidos_aae <- mean(amostra_estratificada1$Valor_em_B)
-media_estados_unidos_aae
-
-media_china_aae <- mean(amostra_estratificada2$Valor_em_B)
-media_china_aae
-
-dados_estratificados <- rbind(amostra_estratificada1, amostra_estratificada2, 
-                                     amostra_estratificada3, amostra_estratificada4, 
-                                     amostra_estratificada5, amostra_estratificada6, 
-                                     amostra_estratificada7, amostra_estratificada8, 
-                                     amostra_estratificada9, amostra_estratificada10)
-
-barplot(sort(table(unindo_dados_estratificados$Pais), decreasing = FALSE),
+#plotando o gráfico para comparar as amostras
+barplot(sort(table(amostra_estratificada$Pais), decreasing = FALSE),
              main = 'Amostra Estratificada',
              xlab = 'Quantidade de empresas',
              ylab = 'País',
@@ -149,93 +127,3 @@ barplot(sort(table(amostra_aleatoria_simples$Pais), decreasing = FALSE),
              xlab = 'Quantidade de empresas',
              ylab = 'País',
              horiz = TRUE)
-
-
-
-#finaliza aqui
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#filtrando dados
-
-#simples
-empresas_brasileiras <- subset(dados_empresas, Pais == 'Brazil')
-head(empresas_brasileiras)
-empresas_brasileiras[1,]
-
-unique(empresas_brasileiras$Industry)
-
-
-# Múltipla condição 'e'
-fintechs_brasileiras <- subset(dados_empresas, Pais == 'Brazil' & Pais == 'Fintech')
-head(fintechs_brasileiras)
-fintechs_brasileiras[1,]
-
-
-# múltipla condição 'ou'
-
-empresas_saopaulo_campinas <- subset(dados_empresas, Cidade == 'Sao Paulo' | Cidade == 'Campinas')
-head(empresas_saopaulo_campinas)
-empresas_saopaulo_campinas
-
-# condição 'e' com 'ou'
-empresas_brasileiras_fintechs_e_IA <- subset(dados_empresas, Pais == 'Brazil' & (Industria == 'Fintech' | Industria == 'Artificial intelligence'))
-empresas_brasileiras_fintechs_e_IA
-
-
-# visualizando informações
-
-# tabela de frequência
-numero_empresas_por_pais <- table(dados_empresas$Pais)
-numero_empresas_por_pais
-
-numero_empresas_por_industria <- table(dados_empresas$Industria)
-numero_empresas_por_industria
-
-numero_empresas_brasileiras_por_industria <- table(empresas_brasileiras$Industria)
-numero_empresas_brasileiras_por_industria
-
-# gráfico de barras
-
-#parâmetros do gráfico de barras
-
-
-barplot(numero_empresas_por_pais, horiz = TRUE)
-barplot(numero_empresas_por_industria, horiz = TRUE)
-barplot(numero_empresas_brasileiras_por_industria, horiz = TRUE)
-
-# ajustando valores para melhorar a visualização
-numero_empresas_por_pais_ordenado <- sort(numero_empresas_por_pais, decreasing = FALSE)
-numero_empresas_por_industria_ordendado <- sort(numero_empresas_por_industria, decreasing = FALSE)
-numero_empresas_brasileiras_por_industria_ordenado <- sort(numero_empresas_brasileiras_por_industria, decreasing = FALSE)
-
-barplot(numero_empresas_por_pais_ordenado, horiz = TRUE)
-barplot(numero_empresas_por_industria_ordendado, horiz = TRUE)
-barplot(numero_empresas_brasileiras_por_industria_ordenado, horiz = TRUE)
-
-#pegando as 10 primeiras posições para países e indústrias
-top10_paises_com_mais_empresas <- tail(numero_empresas_por_pais_ordenado, 10)
-top10_industrias_com_mais_empresas <- tail(numero_empresas_por_industria_ordendado, 10)
-
-barplot(top10_paises_com_mais_empresas, horiz = TRUE)
-barplot(top10_industrias_com_mais_empresas, horiz = TRUE)
-
-# filanizando a visualização
-barplot(top10_paises_com_mais_empresas, horiz = TRUE, las=TRUE)
-barplot(top10_industrias_com_mais_empresas, horiz = TRUE, las=TRUE)
-barplot(numero_empresas_brasileiras_por_industria_ordenado, horiz = TRUE, las=TRUE)
